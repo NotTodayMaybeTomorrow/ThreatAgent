@@ -71,7 +71,7 @@ class ThreatAgent:
         }
 
 if __name__ == "__main__":
-    selected_ollama_models = ["mistral:7b", "phi3:3.8b", "gemma:2b"]
+    selected_ollama_models = ["mistral:latest", "phi3:3.8b", "gemma:2b"]
 
     agent = ThreatAgent(model_choices=selected_ollama_models)
 
