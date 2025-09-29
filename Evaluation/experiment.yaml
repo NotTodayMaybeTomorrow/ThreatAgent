@@ -1,13 +1,7 @@
-# Experiment specification (Week 1 · Day 1)
-# Created: 2025-09-29
+# Experiment specification (Week 1 )
 # Purpose: lock primary/secondary endpoints, experiment matrix, and stats settings.
 # This file is read by the evaluation runner to enumerate conditions.
 
-meta:
-  version: "0.1.0"
-  created: "2025-09-29"
-  description: "Toy Twitter amplification study — evaluation experiment matrix"
-  owner: "Evaluation Lead"
 
 network:
   n_agents: 200
