@@ -1,0 +1,102 @@
+# Experiment specification (Week 1 · Day 1)
+# Created: 2025-09-29
+# Purpose: lock primary/secondary endpoints, experiment matrix, and stats settings.
+# This file is read by the evaluation runner to enumerate conditions.
+
+meta:
+  version: "0.1.0"
+  created: "2025-09-29"
+  description: "Toy Twitter amplification study — evaluation experiment matrix"
+  owner: "Evaluation Lead"
+
+network:
+  n_agents: 200
+  n_ticks: 10
+
+topics:
+  - tech_launch    # product announcement / upcoming gadget
+  - health_tips    # everyday wellness tip (safe, non-medical advice)
+  - community_event # giveaway / local event
+
+start_strategies: ["influencer", "random"]
+
+backends:
+  - baseline
+  - model_a
+  - model_b
+  - model_c
+  - model_d
+  - model_e
+
+# 15 deterministic seeds for the main runs
+seeds: [13404, 16055, 32077, 38547, 43122, 53811, 56656, 82032, 86126, 89602, 91716, 96586, 98451, 99047, 99528]
+
+endpoints:
+  primary:
+    name: "reach_rate_diff_influencer_start"
+    description: "Difference in reach_rate between LLM and Baseline under influencer-start."
+    unit: "percentage_points"
+    aggregation: "per-topic and overall"
+    test: "permutation_mean"
+    effect_size: "cliffs_delta"
+    ci: "bootstrap_BCa_95"
+  secondary:
+    - name: "cascade_size"
+      description: "Number of unique resharers."
+      test: "permutation_median"
+      effect_size: "cliffs_delta"
+      ci: "bootstrap_BCa_95"
+    - name: "cascade_depth"
+      description: "Max depth of the reshare tree."
+      test: "permutation_median"
+      effect_size: "cliffs_delta"
+      ci: "bootstrap_BCa_95"
+    - name: "time_to_peak"
+      description: "Tick index with maximum reshare count."
+      test: "permutation_median"
+      effect_size: "cliffs_delta"
+      ci: "bootstrap_BCa_95"
+    - name: "cost_per_success"
+      description: "LLM calls per successful cascade (reach_rate >= success_threshold)."
+      test: "bootstrap_ratio"
+      effect_size: "ratio"
+      ci: "bootstrap_percentile_95"
+    - name: "persona_reshare_rate"
+      description: "Reshare probability per persona (Friendly vs Skeptical)."
+      test: "permutation_mean"
+      effect_size: "cliffs_delta"
+      ci: "bootstrap_BCa_95"
+    - name: "reach_rate_diff_random_start"
+      description: "LLM vs Baseline under random-start."
+      test: "permutation_mean"
+      effect_size: "cliffs_delta"
+      ci: "bootstrap_BCa_95"
+
+success_definition:
+  reach_rate_threshold: 0.35 # success if >= 35% of network reached (tunable)
+  # Note: Use this threshold only for cost_per_success.
+
+statistics:
+  bootstrap:
+    n_samples: 10000
+    ci: 0.95
+    method: "BCa"
+    seed: 12345
+  permutation:
+    n_permutations: 50000
+    statistic: "mean"   # default for primary; others can override
+    seed: 23456
+  cliffs_delta:
+    bins:
+      negligible: 0.147
+      small: 0.33
+      medium: 0.474
+      large: 1.0
+  multiple_comparisons:
+    method: "BH"
+    q: 0.05
+
+artifacts:
+  output_root: "artifacts"
+  stamp: "auto"       # "auto" = YYYYMMDD-HHMM + short git sha (if available)
+  write_manifest: true
